@@ -1,37 +1,34 @@
-const int ledPin = 13;
-const int buttonPin = 12;
+const int LED_PIN = 13;
+const int BUTTON_PIN = 12;
 
-int lastButtonState = HIGH;
 int buttonState = HIGH;
+int ledState = LOW;
+int counter = 0;
 
 void setup() {
   Serial.begin(9600);
-  pinMode(ledPin, OUTPUT);
-  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, ledState);
 }
 
 void loop() {
-  int reading = digitalRead(buttonPin);
+  int reading = digitalRead(BUTTON_PIN);
 
-  if (reading != lastButtonState) {
+  if (reading != buttonState) {
     delay(50);
 
-    int reading = digitalRead(buttonPin);
+    buttonState = reading;
 
-    if (reading != buttonState) {
-      buttonState = reading;
+    if (buttonState == LOW) {
+      counter++;
+      Serial.print("Кнопка натиснута, лічильник: ");
+      Serial.println(counter);
 
-      if (buttonState == LOW) {
-        Serial.println("Кнопка натиснута");
-        digitalWrite(ledPin, HIGH);
-      } else {
-        Serial.println("Кнопка відпущена");
-        digitalWrite(ledPin, LOW);
-      }
+      ledState = !ledState;
+      digitalWrite(LED_PIN, ledState);
     }
   }
-
-  lastButtonState = reading;
 }
 
 
