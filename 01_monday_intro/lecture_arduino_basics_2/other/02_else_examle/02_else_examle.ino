@@ -17,11 +17,6 @@ void loop() {
     } else {
       Serial.println("Помилка, пароль неправильний!");
     }
-
-    // Очищення символів переходу на новий рядок, що залишились
-    while (Serial.available() > 0) {
-      Serial.read();
-    }
   }
 }
 

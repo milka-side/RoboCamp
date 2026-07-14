@@ -1,35 +1,35 @@
-const int buzzerPin = 8;
-const int button1 = 2;
-const int button2 = 3;
-const int button3 = 4;
+const int BUZZER_PIN = 8;
+const int BUTTON1_PIN = 2;
+const int BUTTON2_PIN = 3;
+const int BUTTON3_PIN = 4;
 
-const int noteC4 = 262;
-const int noteD4 = 294;
-const int noteE4 = 330;
+const int NOTE_C4 = 262;
+const int NOTE_D4 = 294;
+const int NOTE_E4 = 330;
 
 void setup() {
-  pinMode(buzzerPin, OUTPUT);
-
-  pinMode(button1, INPUT_PULLUP);
-  pinMode(button2, INPUT_PULLUP);
-  pinMode(button3, INPUT_PULLUP);
+  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(BUTTON1_PIN, INPUT_PULLUP);
+  pinMode(BUTTON2_PIN, INPUT_PULLUP);
+  pinMode(BUTTON3_PIN, INPUT_PULLUP);
 }
 
 void loop() {
-  bool btn1Pressed = digitalRead(button1) == LOW;
-  bool btn2Pressed = digitalRead(button2) == LOW;
-  bool btn3Pressed = digitalRead(button3) == LOW;
+  bool btn1Pressed = digitalRead(BUTTON1_PIN) == LOW;
+  bool btn2Pressed = digitalRead(BUTTON2_PIN) == LOW;
+  bool btn3Pressed = digitalRead(BUTTON3_PIN) == LOW;
 
   if (btn1Pressed) {
-    tone(buzzerPin, noteC4);
+    tone(BUZZER_PIN, NOTE_C4);
   } 
   else if (btn2Pressed) {
-    tone(buzzerPin, noteD4);
+    tone(BUZZER_PIN, NOTE_D4);
   } 
   else if (btn3Pressed) {
-    tone(buzzerPin, noteE4);
+    tone(BUZZER_PIN, NOTE_E4);
   } 
   else {
-    noTone(buzzerPin);
+    noTone(BUZZER_PIN);
   }
 }
+
