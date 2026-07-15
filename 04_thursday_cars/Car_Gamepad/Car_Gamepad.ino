@@ -23,6 +23,9 @@
     змінилося, і не частіше ніж раз на MOTOR_UPDATE_MS. Якщо надсилати
     її на кожен Bluetooth-звіт геймпада, цикл не встигає, події стають
     у чергу і машинка реагує із запізненням у секунди.
+  
+  УВАГА!!!
+  ПЕРЕД ВИКОРИСТАННЯМ ВКАЖІТЬ КОЛІР ВАШОГО КОНТРОЛЕРА В ЗМІННІЙ CONTROLLER_TYPE У ФАЙЛІ Car_Core.h
 **********************************************************************/
 
 #include "Car_Core.h"
@@ -64,7 +67,7 @@ void loop() {
     stickX = constrain(stickX, -STICK_MAX, STICK_MAX);
 
     // 4. Визначаємо швидкість (чи натиснута кнопка Турбо)
-    int maxSpeed = pad->r1() ? SPEED_TURBO : SPEED_NORMAL;
+    int maxSpeed = Btn_R1(pad) ? SPEED_TURBO : SPEED_NORMAL;
 
     // 5. Розраховуємо газ та поворот
     int drive = -stickY * maxSpeed / STICK_MAX;               
@@ -86,14 +89,13 @@ void loop() {
     Car_SetMotors(left, right);
 
     // 8. Клаксон (кнопка Х)
-    Car_SetHorn(pad->a());
+    Car_SetHorn(Btn_Cross(pad));
 
     // 9. Керування "головою" (сервопривід) через D-pad
     if (millis() - lastServoMove > 30) {   
-      uint8_t d = pad->dpad();
-      if (d & DPAD_LEFT)  currentServoAngle = constrain(currentServoAngle + 2, 0, 180);
-      if (d & DPAD_RIGHT) currentServoAngle = constrain(currentServoAngle - 2, 0, 180);
-      if (d & DPAD_UP)    currentServoAngle = 90;
+      if (Btn_DpadLeft(pad))  currentServoAngle = constrain(currentServoAngle + 2, 0, 180);
+      if (Btn_DpadRight(pad)) currentServoAngle = constrain(currentServoAngle - 2, 0, 180);
+      if (Btn_DpadUp(pad))    currentServoAngle = 90;
       
       Car_SetServo(currentServoAngle);
       lastServoMove = millis();
@@ -101,8 +103,7 @@ void loop() {
 
 #if DEBUG_STICKS
     if (millis() - lastDebugPrint > 250) {
-      Serial.printf("[%lu ms] Y=%4d  RX=%4d  ->  left=%5d  right=%5d\n",
-                    millis(), pad->axisY(), pad->axisRX(), left, right);
+      printControllerDebug(pad);
       lastDebugPrint = millis();
     }
 #endif

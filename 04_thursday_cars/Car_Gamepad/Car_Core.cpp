@@ -1,3 +1,4 @@
+#include "pgmspace.h"
 #include "Car_Core.h"
 #include <Preferences.h>
 #include <Wire.h>
@@ -162,3 +163,93 @@ void Car_SetServo(int angle) {
     Servo_1_Angle(currentHWAngle);
   }
 }
+
+void printRawControllerDebug(ControllerPtr ctl) {
+  Serial.println("---- Gamepad button debug ----");
+
+  // Face buttons (on most gamepads: a=X/Cross, b=Circle, x=Square, y=Triangle)
+  Serial.printf("a=%d b=%d x=%d y=%d\n", ctl->a(), ctl->b(), ctl->x(), ctl->y());
+
+  // Shoulder / triggers
+  Serial.printf("l1=%d r1=%d l2=%d r2=%d\n", ctl->l1(), ctl->r1(), ctl->l2(), ctl->r2());
+
+  // Stick clicks
+  Serial.printf("thumbL=%d thumbR=%d\n", ctl->thumbL(), ctl->thumbR());
+
+  // System / misc buttons
+  Serial.printf("miscButtons: system=%d start=%d select=%d capture=%d\n",
+                ctl->miscSystem(), ctl->miscStart(), ctl->miscSelect(), ctl->miscCapture());
+
+  // D-pad (bitmask)
+  uint8_t d = ctl->dpad();
+  Serial.printf("dpad=0x%02X (up=%d down=%d left=%d right=%d)\n",
+                d, (d & DPAD_UP) != 0, (d & DPAD_DOWN) != 0,
+                (d & DPAD_LEFT) != 0, (d & DPAD_RIGHT) != 0);
+
+  // Raw button bitmask (all buttons at once, useful to spot mis-mapped bits)
+  Serial.printf("buttons()=0x%04X\n", ctl->buttons());
+
+  // Sticks and analog triggers
+  Serial.printf("axisX=%4d axisY=%4d axisRX=%4d axisRY=%4d brake=%4d throttle=%4d\n",
+                ctl->axisX(), ctl->axisY(), ctl->axisRX(), ctl->axisRY(),
+                ctl->brake(), ctl->throttle());
+
+  Serial.println("-------------------------------");
+}
+
+void printControllerDebug(ControllerPtr ctl) {
+  Serial.printf("axisX=%4d axisY=%4d axisRX=%4d axisRY=%4d\n",
+              ctl->axisX(), ctl->axisY(), ctl->axisRX(), ctl->axisRY());
+}
+
+// ==================== ОБГОРТКИ ДЛЯ КНОПОК (за типом геймпада) ====================
+#if CONTROLLER_TYPE == CONTROLLER_TYPE_BLUE
+
+  bool Btn_Cross(ControllerPtr ctl)      { return ctl->a(); }
+  bool Btn_Circle(ControllerPtr ctl)     { return ctl->b(); }
+  bool Btn_Square(ControllerPtr ctl)     { return ctl->x(); }
+  bool Btn_Triangle(ControllerPtr ctl)   { return ctl->y(); }
+
+  bool Btn_L1(ControllerPtr ctl)         { return ctl->l1(); }
+  bool Btn_R1(ControllerPtr ctl)         { return ctl->r1(); }
+  bool Btn_L2(ControllerPtr ctl)         { return ctl->l2(); }
+  bool Btn_R2(ControllerPtr ctl)         { return ctl->r2(); }
+
+  bool Btn_L3(ControllerPtr ctl)         { return ctl->thumbL(); }
+  bool Btn_R3(ControllerPtr ctl)         { return ctl->thumbR(); }
+
+  bool Btn_Start(ControllerPtr ctl)      { return ctl->miscStart(); }
+  bool Btn_Select(ControllerPtr ctl)     { return ctl->miscSelect(); }
+  bool Btn_System(ControllerPtr ctl)     { return ctl->miscSystem(); }
+
+  bool Btn_DpadUp(ControllerPtr ctl)     { return (ctl->dpad() & DPAD_UP)    != 0; }
+  bool Btn_DpadDown(ControllerPtr ctl)   { return (ctl->dpad() & DPAD_DOWN)  != 0; }
+  bool Btn_DpadLeft(ControllerPtr ctl)   { return (ctl->dpad() & DPAD_LEFT)  != 0; }
+  bool Btn_DpadRight(ControllerPtr ctl)  { return (ctl->dpad() & DPAD_RIGHT) != 0; }
+
+#elif CONTROLLER_TYPE == CONTROLLER_TYPE_GREY
+
+  bool Btn_Cross(ControllerPtr ctl)      { return ctl->thumbR(); }
+  bool Btn_Circle(ControllerPtr ctl)     { return ctl->thumbL(); }
+  bool Btn_Square(ControllerPtr ctl)     { return false; } // Button isn't working
+  bool Btn_Triangle(ControllerPtr ctl)   { return ctl->miscSystem(); }
+
+  bool Btn_L1(ControllerPtr ctl)         { return ctl->miscSelect(); }
+  bool Btn_R1(ControllerPtr ctl)         { return ctl->miscStart(); }
+  bool Btn_L2(ControllerPtr ctl)         { return false; } // Button isn't working
+  bool Btn_R2(ControllerPtr ctl)         { return false; } // Button isn't working
+
+  bool Btn_L3(ControllerPtr ctl)         { return ctl->b(); }
+  bool Btn_R3(ControllerPtr ctl)         { return false; } // Button isn't working
+
+  bool Btn_Start(ControllerPtr ctl)      { return ctl->x(); }
+  bool Btn_Select(ControllerPtr ctl)     { return ctl->a(); }
+  bool Btn_System(ControllerPtr ctl)     { return false; } // Button isn't working
+
+  bool Btn_DpadUp(ControllerPtr ctl)     { return ctl->y(); }
+  bool Btn_DpadDown(ControllerPtr ctl)   { return ctl->l1(); }
+  bool Btn_DpadLeft(ControllerPtr ctl)   { return ctl->r1(); }
+  bool Btn_DpadRight(ControllerPtr ctl)  { return false; } // Button isn't working
+
+#endif
+// ===================================================================================
